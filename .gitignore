@@ -1,0 +1,52 @@
+# ---------------------------------------------------------------------------
+# Nothing from the game goes in this repository: no XBE, no Media folder,
+# no code generated from them and no XEX built with that code.
+# Nada do jogo entra aqui: nem XBE, nem Media, nem codigo gerado, nem XEX.
+# ---------------------------------------------------------------------------
+
+# Your own game files (put default.xbe in pc-recomp/assets/)
+pc-recomp/assets/
+Media/
+*.xbe
+*.iso
+*.wmv
+*.adx
+*.afs
+
+# Code generated from the XBE (contains the game's code)
+pc-recomp/generated/
+
+# Build output (the XEX contains the game's code: never share it)
+x360/build/
+x360/tools/build/
+*.xex
+*.exe
+*.pe
+*.obj
+*.lib
+*.pdb
+*.xdb
+*.ilk
+*.map
+
+# Logs, captures and data the game writes on the console
+*.log
+*.mp4
+*.png
+hdd/
+dump/
+shadercache/
+pad_script.txt
+map_tour.txt
+video_tour.txt
+
+# Python, system and editors
+__pycache__/
+*.pyc
+Thumbs.db
+desktop.ini
+Desktop.ini
+.vs/
+.vscode/
+*.suo
+*.user

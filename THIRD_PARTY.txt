@@ -1,0 +1,36 @@
+Third party work used in this port
+
+1. JSRF Unleashed (https://github.com/JuMatt/JetSetRadioFuture-Unleashed), MIT License.
+   x360/runtime/game/jsrf.cpp adapts parts of its port/recomp_manual.c: widescreen, the map selector,
+   the frame counter thread fix and the error messages. The idea of running one game thread at a time
+   (x360/runtime/kernel/guestlock.cpp) also comes from it.
+
+   MIT License
+   
+   Copyright (c) 2026 sp00nz
+   
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+   
+   The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+   
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+
+2. JSRF Decompilation (https://codeberg.org/KeybadeBlox/JSRF-Decompilation), CC0 1.0.
+   The list of function addresses in pc-recomp/config/game.toml was seeded from its symbol table.
+   No code from it is included.
+
+3. XboxXBE-Recomp (https://github.com/TGP482/XboxXBE-Recomp) and BloodyRoarExtremeRecomp
+   (https://github.com/bromurok/BloodyRoarExtremeRecomp), MIT License.
+   The recompiler in pc-recomp/sdk and the base of the Xbox 360 runtime. Licenses in pc-recomp.

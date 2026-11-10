@@ -1,0 +1,43 @@
+# XDK 4134, Jet Set Radio Future USA. Cada valor foi lido no default.xbe (SHA-1 86ffb408...), na instrucao citada.
+# Campo ausente = armadilha com log na primeira vez que for usado. Os valores do 5233 nao valem aqui.
+[layout]
+# D3D8 CDevice
+CDevice_Push              = 0x0     # D3DDevice_SetTexture 0x18DF62 le e 0x18DF64 compara com +4
+CDevice_PushThreshold     = 0x4     # 0x18DF64
+CDevice_Flags             = 0x8     # Direct3D_CreateDevice 0x18E48F/0x18E4BE: ors BehaviorFlags & 0x10
+CDevice_BaseVertex        = 0x1C    # D3DDevice_SetIndices 0x18E0E9 grava BaseVertexIndex
+CDevice_Time              = 0x30    # SetTexture 0x18DF33
+CDevice_PixelShader       = 0x370   # SetPixelShader 0x199BF4
+CDevice_VertexShader      = 0x380   # SelectVertexShader 0x1901D9, SetVertexShader 0x1904A1
+CDevice_IndexBuffer       = 0x38C   # SetIndices 0x18E0BA le, 0x18E0E2 grava
+CDevice_ZScale            = 0x44C   # UpdateProjectionViewportTransform 0x18EA36: faixa Z * este
+CDevice_SuperSampleX      = 0x454   # idem 0x18E9E6: largura do viewport * este
+CDevice_SuperSampleY      = 0x458   # idem 0x18EA0C: altura do viewport * este
+CDevice_BackBufferScale   = 0x464   # InitializeFrameBuffers 0x191C6A; Y em +4, 0x191C83
+CDevice_Transforms        = 0x750   # SetTransform 0x18CC76: 16 dwords em +0x750 + tipo * 64
+CDevice_Viewport          = 0x9D0   # SetViewport 0x18DB9B..0x18DBBF: X, Y, W, H, MinZ, MaxZ
+CDevice_ScreenSpaceOffset = 0x9E8   # SetScreenSpaceOffset 0x18E3D3, 0x18E3E3
+CDevice_Textures          = 0xA78   # SetTexture 0x18DF20, 0x18DF59
+CDevice_RenderTarget      = 0x2070  # SetViewport 0x18DAAA, SetRenderTarget 0x18D106
+CDevice_Depth             = 0x2074  # GetDepthStencilSurface 0x18DA75
+CDevice_BackBuffer        = 0x207C  # GetBackBuffer 0x18D63D, indice 0
+CDevice_FrontBuffer       = 0x2080  # GetBackBuffer 0x18D62F/0x18D63D, indice -1
+CDevice_VBlankCallback    = 0x242C  # SetVerticalBlankCallback 0x18CE3A
+CDevice_VBlankEvent       = 0x2430  # BlockUntilVerticalBlank 0x18CE67: espera neste KEVENT
+CDevice_DisplayFlags      = 0x2450  # Swap 0x19869F: testa 0x1000000 ao dimensionar a imagem
+CDevice_SwapCount         = 0x2ABC  # Swap 0x198F39, 0x198F56 (inc)
+CDevice_Size              = 0x2AD8  # maior campo achado: 0x2AD4 (0x1920E0). 0x19B200 + 0x2AE0 ja e g_pDevice
+# D3D8 globais
+DirtyFlags_Texture        = 0x4800  # SetTexture 0x18DF95
+TextureState_Stage        = 32      # SetTextureStageStateNotInline 0x18F28B: stage << 5 dwords
+Stream_Size               = 12      # SetStreamSource 0x1900EA/0x1900ED: n * 12
+Stream_Stride             = 0x0     # SetStreamSource 0x190132
+Stream_Buffer             = 0x8     # SetStreamSource 0x190138
+# XAPI, registro de tipo de dispositivo XPP
+XPP_Current               = 0x0     # XGetDevices 0x1BD60A
+XPP_Changed               = 0x4     # XGetDevices 0x1BD60C, XGetDeviceChanges 0x1BD62A
+XPP_Previous              = 0x8     # XGetDevices 0x1BD612
+# DSOUND, imagem de efeitos (dsstdfx.bin)
+EffectsImage_Skip0        = 0x804   # 0x1A1782: soma esta contagem de dwords
+EffectsImage_Skip1        = 0x80C   # 0x1A177C: le esta contagem de dwords
+EffectsImage_Desc         = 0x818   # 0x1A178B: descritor em imagem + 0x818 + (Skip0 + Skip1) * 4

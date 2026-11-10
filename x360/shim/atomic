@@ -1,0 +1,116 @@
+// <atomic> for the VS2010 Xbox 360 compiler: the operations the runtime uses, sequentially consistent,
+// for 32 bit integers and bool (interlocked operations) and 64 bit integers (interlocked 64 bit compare exchange).
+#pragma once
+#include "host.h"
+
+namespace std {
+
+enum memory_order { memory_order_relaxed, memory_order_acquire, memory_order_release, memory_order_acq_rel, memory_order_seq_cst };
+
+template <typename T, int Size = sizeof(T)>
+class atomic;
+
+template <typename T>
+class atomic<T, 4> {
+public:
+    atomic() : v_(0) {}
+    atomic(T v) : v_(LONG(v)) {}
+    T load(memory_order = memory_order_seq_cst) const {
+        __lwsync();
+        T v = T(v_);
+        __lwsync();
+        return v;
+    }
+    void store(T v, memory_order = memory_order_seq_cst) { InterlockedExchange(&v_, LONG(v)); }
+    T exchange(T v, memory_order = memory_order_seq_cst) { return T(InterlockedExchange(&v_, LONG(v))); }
+    T fetch_add(T d, memory_order = memory_order_seq_cst) { return T(InterlockedExchangeAdd(&v_, LONG(d))); }
+    T fetch_sub(T d, memory_order = memory_order_seq_cst) { return T(InterlockedExchangeAdd(&v_, -LONG(d))); }
+    bool compare_exchange_strong(T& expected, T desired, memory_order = memory_order_seq_cst) {
+        LONG old = InterlockedCompareExchange(&v_, LONG(desired), LONG(expected));
+        if (old == LONG(expected)) return true;
+        expected = T(old);
+        return false;
+    }
+    operator T() const { return load(); }
+    T operator=(T v) {
+        store(v);
+        return v;
+    }
+    T operator++() { return T(InterlockedIncrement(&v_)); }
+    T operator--() { return T(InterlockedDecrement(&v_)); }
+    T operator++(int) { return T(InterlockedIncrement(&v_) - 1); }
+    T operator--(int) { return T(InterlockedDecrement(&v_) + 1); }
+    T operator+=(T d) { return T(InterlockedExchangeAdd(&v_, LONG(d)) + LONG(d)); }
+    T operator-=(T d) { return T(InterlockedExchangeAdd(&v_, -LONG(d)) - LONG(d)); }
+
+private:
+    atomic(const atomic&);
+    atomic& operator=(const atomic&);
+    volatile LONG v_;
+};
+
+template <typename T>
+class atomic<T, 8> {
+public:
+    atomic() : v_(0) {}
+    atomic(T v) : v_(LONGLONG(v)) {}
+    T load(memory_order = memory_order_seq_cst) const {
+        return T(InterlockedCompareExchange64(const_cast<volatile LONGLONG*>(&v_), 0, 0));
+    }
+    void store(T v, memory_order = memory_order_seq_cst) { exchange(v); }
+    T exchange(T v, memory_order = memory_order_seq_cst) {
+        LONGLONG old = v_;
+        for (;;) {
+            LONGLONG seen = InterlockedCompareExchange64(&v_, LONGLONG(v), old);
+            if (seen == old) return T(old);
+            old = seen;
+        }
+    }
+    T fetch_add(T d, memory_order = memory_order_seq_cst) {
+        LONGLONG old = v_;
+        for (;;) {
+            LONGLONG seen = InterlockedCompareExchange64(&v_, old + LONGLONG(d), old);
+            if (seen == old) return T(old);
+            old = seen;
+        }
+    }
+    T fetch_sub(T d, memory_order m = memory_order_seq_cst) { return fetch_add(T(0 - d), m); }
+    operator T() const { return load(); }
+    T operator=(T v) {
+        store(v);
+        return v;
+    }
+    T operator+=(T d) { return fetch_add(d) + d; }
+
+private:
+    atomic(const atomic&);
+    atomic& operator=(const atomic&);
+    volatile LONGLONG v_;
+};
+
+template <>
+class atomic<bool, 1> {
+public:
+    atomic() : v_(0) {}
+    atomic(bool v) : v_(v ? 1 : 0) {}
+    bool load(memory_order = memory_order_seq_cst) const {
+        __lwsync();
+        bool v = v_ != 0;
+        __lwsync();
+        return v;
+    }
+    void store(bool v, memory_order = memory_order_seq_cst) { InterlockedExchange(&v_, v ? 1 : 0); }
+    bool exchange(bool v, memory_order = memory_order_seq_cst) { return InterlockedExchange(&v_, v ? 1 : 0) != 0; }
+    operator bool() const { return load(); }
+    bool operator=(bool v) {
+        store(v);
+        return v;
+    }
+
+private:
+    atomic(const atomic&);
+    atomic& operator=(const atomic&);
+    volatile LONG v_;
+};
+
+}  // namespace std

@@ -1,0 +1,26 @@
+# Text is stored with LF in the repository; Windows scripts keep CRLF in the working folder.
+* text=auto
+
+*.cpp  text
+*.h    text
+*.py   text
+*.txt  text
+*.md   text
+*.toml text
+*.ps1  text eol=crlf
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+
+# Headers without an extension
+x360/shim/atomic             text
+x360/shim/condition_variable text
+x360/shim/mutex              text
+
+# Binaries: never touch
+*.xbe binary
+*.xex binary
+*.exe binary
+*.png binary
+*.jpg binary
+*.zip binary
+*.rar binary

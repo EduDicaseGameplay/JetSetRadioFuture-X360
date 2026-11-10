@@ -1,0 +1,47 @@
+// <mutex> for the VS2010 Xbox 360 compiler (see host.h)
+#pragma once
+#include "host.h"
+
+namespace std {
+
+class mutex : public host::Mutex {};
+class recursive_mutex : public host::Mutex {};  // critical sections are recursive
+
+template <typename M>
+class lock_guard {
+public:
+    explicit lock_guard(M& m) : m_(m) { m_.lock(); }
+    ~lock_guard() { m_.unlock(); }
+
+private:
+    lock_guard(const lock_guard&);
+    lock_guard& operator=(const lock_guard&);
+    M& m_;
+};
+
+template <typename M>
+class unique_lock {
+public:
+    explicit unique_lock(M& m) : m_(&m), owns_(true) { m_->lock(); }
+    ~unique_lock() {
+        if (owns_) m_->unlock();
+    }
+    void lock() {
+        m_->lock();
+        owns_ = true;
+    }
+    void unlock() {
+        m_->unlock();
+        owns_ = false;
+    }
+    bool owns_lock() const { return owns_; }
+    M* mutex() const { return m_; }
+
+private:
+    unique_lock(const unique_lock&);
+    unique_lock& operator=(const unique_lock&);
+    M* m_;
+    bool owns_;
+};
+
+}  // namespace std

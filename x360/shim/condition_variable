@@ -1,0 +1,46 @@
+// <condition_variable> for the VS2010 Xbox 360 compiler: a semaphore released once per waiter on notify.
+// Waits may wake spuriously, as the standard allows; every caller in the runtime waits in a loop.
+#pragma once
+#include "mutex"
+
+namespace std {
+
+class condition_variable {
+public:
+    condition_variable() : waiters_(0) { sema_ = CreateSemaphore(NULL, 0, 0x7FFFFFFF, NULL); }
+    ~condition_variable() { CloseHandle(sema_); }
+
+    void notify_all() {
+        LONG n = waiters_;
+        if (n > 0) ReleaseSemaphore(sema_, n, NULL);
+    }
+    void notify_one() {
+        if (waiters_ > 0) ReleaseSemaphore(sema_, 1, NULL);
+    }
+    void wait(unique_lock<mutex>& lock) { WaitMs(lock, INFINITE); }
+    template <typename Pred>
+    void wait(unique_lock<mutex>& lock, Pred pred) {
+        while (!pred()) WaitMs(lock, INFINITE);
+    }
+    // false on timeout
+    bool WaitNs(unique_lock<mutex>& lock, int64_t ns) {
+        DWORD ms = ns <= 0 ? 0 : ns >= 0x7FFFFFFFll * 1000000 ? 0x7FFFFFFF : DWORD((ns + 999999) / 1000000);
+        return WaitMs(lock, ms);
+    }
+
+private:
+    bool WaitMs(unique_lock<mutex>& lock, DWORD ms) {
+        InterlockedIncrement(&waiters_);
+        lock.unlock();
+        DWORD r = WaitForSingleObject(sema_, ms);
+        InterlockedDecrement(&waiters_);
+        lock.lock();
+        return r == WAIT_OBJECT_0;
+    }
+    condition_variable(const condition_variable&);
+    condition_variable& operator=(const condition_variable&);
+    HANDLE sema_;
+    volatile LONG waiters_;
+};
+
+}  // namespace std
